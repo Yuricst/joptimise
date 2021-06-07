@@ -1,4 +1,4 @@
-# joptimise
+# joptimise :large_blue_circle::white_circle::red_circle: 🇫🇷
 Julia wrapper to ipopt and snopt
 
 
