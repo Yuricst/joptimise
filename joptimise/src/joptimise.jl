@@ -20,4 +20,9 @@ include("minimize.jl")
 include("cache.jl")
 include("ipopt_wrap.jl")
 
+# exported functions
+export minimize
+export IPOPT
+export OptimOptions
+
 end
