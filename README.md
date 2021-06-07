@@ -11,7 +11,7 @@ Import module, define objective function which mutates the constraint value `g` 
 ```julia
 using joptimise
 
-function objectove!(g, x)
+function objective!(g, x)
     # compute objective
     f = objective_value(x)
     # compute n constraint
