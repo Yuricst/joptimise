@@ -20,6 +20,9 @@ function objective!(g, x)
     # return objective
     return f
 end
+
+# number of constraints
+ng = 2
 ```
 
 then call minimizer
