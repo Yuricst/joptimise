@@ -49,6 +49,6 @@ solver = IPOPT(ip_options)
 options = OptimOptions(;solver, derivatives=ForwardFD())
 
 # run minimizer
-xopt, fopt, info = minimize(rastrigin!, x0, ng, lx, ux, lg, ug, options);
+xopt, fopt, info = minimize(rastrigin!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, options=options);
 
 println("Done!")

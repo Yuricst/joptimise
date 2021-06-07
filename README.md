@@ -32,5 +32,5 @@ ip_options = Dict(
 solver = IPOPT(ip_options)
 options = OptimOptions(;solver, derivatives=ForwardFD())
 
-xopt, fopt, info = minimize(objective!, x0, ng, lx, ux, lg, ug, options);
+xopt, fopt, info = minimize(objective!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, options=options);
 ```
