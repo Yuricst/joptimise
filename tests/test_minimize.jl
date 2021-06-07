@@ -46,7 +46,7 @@ ip_options = Dict(
     "tol" => 1e-6
 )
 solver = IPOPT(ip_options)
-options = OptimOptions(;solver, derivatives=joptimise.ForwardFD())
+options = OptimOptions(;solver, derivatives=ForwardFD())
 
 # run minimizer
 xopt, fopt, info = minimize(rastrigin!, x0, ng, lx, ux, lg, ug, options);

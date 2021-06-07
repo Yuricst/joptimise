@@ -24,5 +24,6 @@ include("ipopt_wrap.jl")
 export minimize
 export IPOPT
 export OptimOptions
+export ForwardFD
 
 end
