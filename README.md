@@ -1,6 +1,7 @@
-# joptimise :large_blue_circle::white_circle::red_circle: 🇫🇷
+# joptimise 
 Julia wrapper to ipopt and snopt
 
+:large_blue_circle::white_circle::red_circle:
 
 ### Dependencies
 `Ipopt`, `FiniteDiff`, `SparseArrays`
