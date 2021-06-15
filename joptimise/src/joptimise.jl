@@ -19,10 +19,13 @@ using SparseArrays
 include("minimize.jl")
 include("cache.jl")
 include("ipopt_wrap.jl")
+include("snopt_wrap.jl")
+include("_snopt.jl")
 
 # exported functions
 export minimize
 export IPOPT
+export SNOPT
 export OptimOptions
 export ForwardFD
 

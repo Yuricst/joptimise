@@ -41,14 +41,27 @@ ux = [5.0, 5.0]
 lg = -Inf*ones(ng);
 ug = zeros(ng);
 
-ip_options = Dict(
-    "max_iter" => 2500,   # 1500 ~ 2500
-    "tol" => 1e-6
+# ip_options = Dict(
+#     "max_iter" => 2500,   # 1500 ~ 2500
+#     "tol" => 1e-6
+# )
+# solver = IPOPT(ip_options)
+
+snopt_opt = Dict(
+    "Major iterations limit" => 2
 )
-solver = IPOPT(ip_options)
-options = OptimOptions(;solver, derivatives=ForwardFD())
+
+solver = SNOPT(options=snopt_opt)
+options = OptimOptions(;solver=solver, derivatives=ForwardFD())
+
+# sn_options = Dict(
+#     "Major feasibility tolerance" => 1.e-6
+# )
+# solver = SNOPT(sn_options, "foo", nothing)  #sn_options)
+# options = OptimOptions(;solver=solver, derivatives=ForwardFD())
+println("options: $options")
 
 # run minimizer
-xopt, fopt, info = minimize(rastrigin!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, options=options);
+xopt, fopt, info = minimize(rastrigin!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug)#, options=options);
 
 println("Done!")

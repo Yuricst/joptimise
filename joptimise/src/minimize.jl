@@ -50,7 +50,6 @@ Minimize function, common interface to IPOPT and SNOPT
 # Returns
     - (tuple): xstar, fstar, info
 """
-#function minimize(func!, x0, ng, lx=-Inf, ux=Inf, lg=-Inf, ug=0.0, options=OptimOptions(), outputfile=false)
 function minimize(func!, x0, ng; kwargs...)
     #, lx=-Inf, ux=Inf, lg=-Inf, ug=0.0, options=OptimOptions(), outputfile=false)
     # unpack values
@@ -58,8 +57,9 @@ function minimize(func!, x0, ng; kwargs...)
     ux = _assign_from_kwargs(Dict(kwargs), :ux, Inf)
     lg = _assign_from_kwargs(Dict(kwargs), :lg, -Inf)
     ug = _assign_from_kwargs(Dict(kwargs), :ug, 0.0)
-    options = _assign_from_kwargs(Dict(kwargs), :OptimOptions, OptimOptions())
+    options    = _assign_from_kwargs(Dict(kwargs), :options, OptimOptions())
     outputfile = _assign_from_kwargs(Dict(kwargs), :outputfile, false)
+    solver = _assign_from_kwargs(Dict(kwargs), :solver, "snopt")
 
     # initialize number of decision variables
     nx = length(x0)
@@ -77,7 +77,18 @@ function minimize(func!, x0, ng; kwargs...)
     rows, cols = _get_sparsity(options.sparsity, nx, ng)
 
     # returns xopt, fopt, info, out
-    xstar, fstar, info = minimize_solver_specific(options.solver, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
+    println("-----\n")
+    print("options.solver: ")
+    println(options.solver)
+    println("----- ")
+    println("solver: $solver")
+    println("----- ")
+
+    if cmp(solver, "ipopt") == 0
+        xstar, fstar, info = minimize_solver_specific(options.solver, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
+    elseif cmp(solver, "snopt") == 0
+        xstar, fstar, info, _ = minimize_snopt(options.solver, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
+    end
     return xstar, fstar, info
 end
 

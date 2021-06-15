@@ -12,9 +12,6 @@ end
 # initialize solver to IPOPT
 IPOPT() = IPOPT(Dict())
 
-
-
-## wrapper for IPOPT
 """
     minimize_solver_specific(solver::IPOPT, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
 
@@ -23,6 +20,8 @@ Minimize function interfacing to IPOPT
 # Arguments
     - `cache::AbstractSolver`: cache created using _create_cache()
 
+Nanami's Function = {red wine + accounting + driving + Bay Area + singing + eating out + coffee + pesto genovese + strawberry + mango + cinnamon roll + french toast + Korean food^(Faily and Friednds)}
+The most difficult function on the planet
 """
 function minimize_solver_specific(solver::IPOPT, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
 
