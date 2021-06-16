@@ -6,14 +6,18 @@ Julia wrapper to ipopt and snopt, parts borrowed from  [Snow.jl](https://github.
 ### Dependencies
 `Ipopt`, `FiniteDiff`, `SparseArrays`
 
-For using `SNOPT`, users must also have an active license and set as environment variables in `~/.bashrc` (working on WSL):
+### Environment setup
+For using `SNOPT`, users must also have an active license. 
+
+#### Windows (Windows Subsystem for Linux)
+Set as environment variables in `~/.bashrc` (working on WSL):
 
 ```bash
 export SNOPT_LICENSE="$HOME/path-to/snopt7.lic"
 export LD_LIBRARY_PATH="$HOME/path-to/libsnopt7"
 ```
 
-### Install
+### Installation
 
 ```julia-repl
 (@v1.6) pkg> dev https://github.com/Yuricst/joptimise.git
