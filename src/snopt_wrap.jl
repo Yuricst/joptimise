@@ -2,7 +2,6 @@
 SNOPT wrapper
 """
 
-using snopt
 
 """
     minimize_solver_specific(solver::SNOPT, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)

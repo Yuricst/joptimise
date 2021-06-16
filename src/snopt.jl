@@ -3,15 +3,15 @@ SNOPT wrapper to c++ functions
 Modified from SNOPT7.jl (https://github.com/snopt/SNOPT7.jl)
 and Snopt.jl (https://github.com/byuflowlab/Snopt.jl)
 """
-module snopt
+#module snopt
 
-using SparseArrays
+#using SparseArrays
 
-export snopta
+#export snopta
 
-function __init__()
-    # Set up library path
-end
+# function __init__()
+#     # Set up library path
+# end
 
 const snoptlib = "libsnopt7"
 
@@ -666,4 +666,4 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols,
 end
 
 
-end  # end module
+#end  # end module
