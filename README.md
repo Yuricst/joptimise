@@ -13,6 +13,12 @@ export SNOPT_LICENSE="$HOME/path-to/snopt7.lic"
 export LD_LIBRARY_PATH="$HOME/path-to/libsnopt7"
 ```
 
+### Install
+
+```julia-repl
+(@v1.6) pkg> dev https://github.com/Yuricst/joptimise.git
+```
+
 ### Usage
 Import module, define objective function which mutates the constraint value `g` and returns the objective value:
 
