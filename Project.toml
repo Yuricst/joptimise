@@ -1,4 +1,13 @@
 name = "joptimise"
-uuid = "fa655efa-6eb9-40f1-8f99-402d1a9346b5"
-authors = ["Yuricst <yuri.shimane@gmail.com>"]
+uuid = "7157bdf0-7eb8-4b5b-ac34-d91c11e157f3"
+authors = ["Yuricst <yuri.shimane@gmail.com> and contributors"]
 version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
