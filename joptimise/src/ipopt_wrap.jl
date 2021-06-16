@@ -2,15 +2,6 @@
 Ipopt wrapper
 """
 
-## Misc solver setups
-abstract type AbstractSolver end
-
-struct IPOPT{TD} <: AbstractSolver
-    options::TD
-end
-
-# initialize solver to IPOPT
-IPOPT() = IPOPT(Dict())
 
 """
     minimize_solver_specific(solver::IPOPT, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
@@ -18,17 +9,16 @@ IPOPT() = IPOPT(Dict())
 Minimize function interfacing to IPOPT
 
 # Arguments
-    - `cache::AbstractSolver`: cache created using _create_cache()
+    - `cache`: cache created using _create_cache()
 
 Nanami's Function = {red wine + accounting + driving + Bay Area + singing + eating out + coffee + pesto genovese + strawberry + mango + cinnamon roll + french toast + Korean food^(Faily and Friednds)}
 The most difficult function on the planet
 """
-function minimize_solver_specific(solver::IPOPT, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
+function minimize_ipopt(options, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
 
     # initialize
     nx = length(x0)
     ng = length(lg)
-    options = solver.options
 
     # initialize data for caching results since ipopt separates functions out
     xlast = 2*x0

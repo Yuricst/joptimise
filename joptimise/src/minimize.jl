@@ -3,19 +3,10 @@ Wrapper for minimization function
 """
 
 
-# optimizer options
-struct OptimOptions{T1,T2,T3}
-    sparsity::T1  # AbstractSparsityPattern
-    derivatives::T2  # AbstractDiffMethod
-    solver::T3  # AbstractSolver
-end
-
-# function to default optimization options
-OptimOptions(; sparsity=DensePattern(), derivatives=ForwardFD(), solver=IPOPT()) = OptimOptions(sparsity, derivatives, solver)
-
-
 ## Minimization function
-# resize bounds if float is passed
+"""
+Method to resize bounds if float is passed
+"""
 function _resize_bounds(lx, nx)
     if length(lx) == 1 && nx > 1
         lx = lx*ones(nx)
@@ -41,10 +32,13 @@ Minimize function, common interface to IPOPT and SNOPT
     - x0 (Array): initial guess
     - ng (Float): number of constraints
     - lx (Array): lower bound on x
-    - lg (Array): lower bound on constraints
     - ux (Array): upper bound on x
-    - options (OptimOptions): options constructed
+    - lg (Array): lower bound on constraints
     - ug (Array): upper bound on constraints
+    - solver
+    - options (Dict): options constructed
+    - sparsity
+    - derivatives
     - outputfile (boolean): whether to create output file
 
 # Returns
@@ -57,9 +51,11 @@ function minimize(func!, x0, ng; kwargs...)
     ux = _assign_from_kwargs(Dict(kwargs), :ux, Inf)
     lg = _assign_from_kwargs(Dict(kwargs), :lg, -Inf)
     ug = _assign_from_kwargs(Dict(kwargs), :ug, 0.0)
-    options    = _assign_from_kwargs(Dict(kwargs), :options, OptimOptions())
-    outputfile = _assign_from_kwargs(Dict(kwargs), :outputfile, false)
-    solver = _assign_from_kwargs(Dict(kwargs), :solver, "snopt")
+    solver      = _assign_from_kwargs(Dict(kwargs), :solver, "ipopt")
+    options     = _assign_from_kwargs(Dict(kwargs), :options,  Dict())
+    sparsity    = _assign_from_kwargs(Dict(kwargs), :sparsity, DensePattern())
+    derivatives = _assign_from_kwargs(Dict(kwargs), :derivatives, ForwardFD())
+    outputfile  = _assign_from_kwargs(Dict(kwargs), :outputfile, false)
 
     # initialize number of decision variables
     nx = length(x0)
@@ -71,23 +67,15 @@ function minimize(func!, x0, ng; kwargs...)
     ug = _resize_bounds(ug, ng)
 
     # create cache
-    cache = _create_cache(options.sparsity, options.derivatives, func!, nx, ng)
+    cache = _create_cache(sparsity, derivatives, func!, nx, ng)
 
     # determine sparsity pattern
-    rows, cols = _get_sparsity(options.sparsity, nx, ng)
-
-    # returns xopt, fopt, info, out
-    println("-----\n")
-    print("options.solver: ")
-    println(options.solver)
-    println("----- ")
-    println("solver: $solver")
-    println("----- ")
+    rows, cols = _get_sparsity(sparsity, nx, ng)
 
     if cmp(solver, "ipopt") == 0
-        xstar, fstar, info = minimize_solver_specific(options.solver, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
+        xstar, fstar, info = minimize_ipopt(options, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
     elseif cmp(solver, "snopt") == 0
-        xstar, fstar, info, _ = minimize_snopt(options.solver, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
+        xstar, fstar, info = minimize_snopt(options, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
     end
     return xstar, fstar, info
 end

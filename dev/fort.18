@@ -165,7 +165,7 @@
        2  x      2   SBS         1.00001         0.00000        -5.00000         5.00000         0.00000      3
 
  Time for MPS input                             0.00 seconds
- Time for solving problem                       0.05 seconds
+ Time for solving problem                       0.04 seconds
  Time for solution output                       0.00 seconds
- Time for constraint functions                  0.05 seconds
+ Time for constraint functions                  0.04 seconds
  Time for objective function                    0.00 seconds

@@ -2,7 +2,7 @@
 Examples from: https://github.com/byuflowlab/Snopt.jl/blob/master/examples/examples.jl
 """
 
-push!(LOAD_PATH, ".")
+push!(LOAD_PATH, "../joptimise/src")
 
 include("Snopt.jl")
 #using Snopt

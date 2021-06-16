@@ -1,14 +1,14 @@
-#module _snopt
+module Snopt
 
-#using SparseArrays
+using SparseArrays
 
-# export snopta
+export snopta
 
 function __init__()
     # Set up library path
 end
 
-const libsnopt7 = "libsnopt7"
+const snoptlib = "libsnopt7"
 
 #const snoptlib = joinpath(dirname(@__FILE__), "../deps/src/libsnopt")
 
@@ -265,30 +265,30 @@ function setoptions(options, work)
         errors[1] = 0
 
         if typeof(value) == String
-
-            value = string(value, repeat(" ", 72-length(value)))
-
-            ccall( (:snset_, snoptlib), Nothing,
-                (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
-                Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-                value, PRINTNUM, SUMNUM, errors,
-                work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
-
+            setOption!(work, value)
+        #     value = string(value, repeat(" ", 72-length(value)))
+        #
+        #     ccall( (:snset_, snoptlib), Nothing,
+        #         (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
+        #         Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
+        #         value, PRINTNUM, SUMNUM, errors,
+        #         work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
+        #
         elseif isinteger(value)
-
-            ccall( (:snseti_, snoptlib), Nothing,
-                (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
-                Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-                buffer, value, PRINTNUM, SUMNUM, errors,
-                work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
-
+            setOption!(work, key, value)
+        #     ccall( (:snseti_, snoptlib), Nothing,
+        #         (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
+        #         Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
+        #         buffer, value, PRINTNUM, SUMNUM, errors,
+        #         work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
+        #
         elseif isreal(value)
-
-            ccall( (:snsetr_, snoptlib), Nothing,
-                (Ptr{Cuchar}, Ref{Cdouble}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
-                Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-                buffer, value, PRINTNUM, SUMNUM, errors,
-                work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
+            setOption!(work, key, value)
+        #     ccall( (:snsetr_, snoptlib), Nothing,
+        #         (Ptr{Cuchar}, Ref{Cdouble}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
+        #         Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
+        #         buffer, value, PRINTNUM, SUMNUM, errors,
+        #         work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
         end
 
         if errors[1] > 0
@@ -298,6 +298,54 @@ function setoptions(options, work)
     end
 
     return nothing
+end
+
+
+function setOption!(prob::Workspace, optstring::String)
+    # Set SNOPT7 option via string
+    if !isascii(optstring)
+        error("SNOPT7: Non-ASCII parameters not supported")
+    end
+
+    errors = [0]
+    ccall((:f_snset, snoptlib), Cvoid,
+          (Ptr{UInt8}, Cint, Ptr{Cint},
+           Ptr{Cint}, Cint, Ptr{Cdouble}, Cint),
+          optstring, length(optstring), errors,
+          prob.iw, prob.leniw, prob.rw, prob.lenrw)
+    return errors[1]
+end
+
+function setOption!(prob::Workspace, keyword::String, value::Int)
+    # Set SNOPT7 integer option
+    if !isascii(keyword)
+        error("SNOPT7: Non-ASCII parameters not supported")
+    end
+
+    errors = [0]
+    ccall((:f_snseti, snoptlib), Cvoid,
+          (Ptr{UInt8}, Cint, Cint, Ptr{Cint},
+           Ptr{Cint}, Cint, Ptr{Cdouble}, Cint),
+           keyword, length(keyword), value, errors,
+          #optstring, length(optstring), value, errors,
+          prob.iw, prob.leniw, prob.rw, prob.lenrw)
+    return errors[1]
+end
+
+function setOption!(prob::Workspace, keyword::String, value::Float64)
+    # Set SNOPT7 real option
+    if !isascii(keyword)
+        error("SNOPT7: Non-ASCII parameters not supported")
+    end
+
+    errors = [0]
+    ccall((:f_snsetr, snoptlib), Cvoid,
+          (Ptr{UInt8}, Cint, Cdouble, Ptr{Cint},
+           Ptr{Cint}, Cint, Ptr{Cdouble}, Cint),
+           keyword, length(keyword), value, errors,
+          #optstring, length(optstring), value, errors,
+          prob.iw, prob.leniw, prob.rw, prob.lenrw)
+    return errors[1]
 end
 
 
@@ -342,14 +390,14 @@ function setmemory(INFO, nf, nx, nxname, nfname, neA, neG, work)
     for (key,value) in zip(memkey, memvalue)
         buffer = string(key, repeat(" ", 55-length(key)))  # buffer length is 55 so pad with space.
         errors[1] = 0
-        ccall( (:snseti_, snoptlib), Nothing,
-            (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
-            Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-            buffer, value, PRINTNUM, SUMNUM, errors,
-            work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
-        if errors[1] > 0
-            @warn errors[1], " error encountered while lengths in options from memory sizing"
-        end
+        # ccall( (:snseti_, snoptlib), Nothing,
+        #     (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
+        #     Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
+        #     buffer, value, PRINTNUM, SUMNUM, errors,
+        #     work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
+        # if errors[1] > 0
+        #     @warn errors[1], " error encountered while lengths in options from memory sizing"
+        # end
     end
 
     return nothing
@@ -548,17 +596,17 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols,
     if haskey(options, "Summary file")
         sumfile = options["Summary file"]
     end
-    openfiles(printfile, sumfile)
+    #openfiles(printfile, sumfile)
 
     # ----- initialize -------
     work = sninit(nx, nf)
 
     # --- set options ----
-    setoptions(options, work)
+    setoptions(options, work)   # FIXME!
 
     # ---- set memory requirements ------
     INFO = Cint[0]
-    setmemory(INFO, nf, nx, nxname, nfname, neA, neG, work)
+    setmemory(INFO, nf, nx, nxname, nfname, neA, neG, work)  # FIXME!
 
     # --- call snopta ----
     mincw = Cint[0]
@@ -585,7 +633,7 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols,
         Ptr{Cint}, Ptr{Cint}, Ptr{Cdouble},
         Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint},
         Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-        start.start, nf, nx, nxname, nfname,
+        start.start, nf, nx, nxname, nfname,  # Start, nf, n, nxname, nfname
         objadd, objrow, names.prob, usrfun,
         iAfun, jAvar, lenA, neA, Aval,
         iGfun, jGvar, lenG, neG,
@@ -598,7 +646,7 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols,
 
 
     # close output files
-    closefiles()
+    #closefiles()
 
     # pack outputs
     warm = WarmStart(ns[1], start.xstate, start.fstate, start.x, start.f,
@@ -611,4 +659,4 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols,
 end
 
 
-#end  # end module
+end  # end module
