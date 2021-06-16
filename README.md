@@ -10,7 +10,7 @@ Julia wrapper to ipopt and snopt, parts borrowed from  [Snow.jl](https://github.
 For using `SNOPT`, users must also have an active license. 
 
 ### Windows (Windows Subsystem for Linux)
-Set as environment variables in `~/.bashrc` (working on WSL):
+Usage on native Windows is discouraged; setting up a Julia environment on WSL seems to work well with SNOPT. Set as environment variables in `~/.bashrc` (working on WSL):
 
 ```bash
 export SNOPT_LICENSE="$HOME/path-to/snopt7.lic"
