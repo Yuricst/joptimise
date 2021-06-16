@@ -42,7 +42,7 @@ x0 = [4.0; 4.0]
 # bounds on variables
 lx = [-5.0; -5.0]
 ux = [5.0; 5.0]
-# bounds on constriants
+# bounds on constraints
 lg = [0.0]
 ug = [0.0]
 # number of constraints
