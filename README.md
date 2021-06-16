@@ -19,29 +19,47 @@ Import module, define objective function which mutates the constraint value `g` 
 ```julia
 using joptimise
 
-function objective!(g, x)
+function rosenbrock!(g, x)
     # compute objective
-    f = objective_value(x)
-    # compute n constraint
-    g[1] = constraint_1(x)
-    g[2] = constraint_2(x)
-    # return objective
+    f = (1 - x[1])^2 + 100*(x[2] - x[1]^2)^2
+    # constraint
+    g[1] = x[1]^2 + x[2]^2 - 1.0
     return f
 end
 
+# initial guess
+x0 = [4.0; 4.0]
+# bounds on variables
+lx = [-5.0; -5.0]
+ux = [5.0; 5.0]
+# bounds on constriants
+lg = [0.0]
+ug = [0.0]
 # number of constraints
-ng = 2
+ng = 1
 ```
 
-then call minimizer
+then call SNOPT
+
+```julia
+sn_options = Dict(
+    "Major feasibility tolerance" => 1.e-6,
+    "Major optimality tolerance"  => 1.e-6,
+    "Minor feasibility tolerance" => 1.e-6,
+    "Major iterations limit" => 1000,
+    "Major print level" => 1,
+)
+
+xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options);
+```
+
+or IPOPT
 
 ```julia
 ip_options = Dict(
     "max_iter" => 2500,   # 1500 ~ 2500
     "tol" => 1e-6
 )
-solver = IPOPT(ip_options)
-options = OptimOptions(;solver, derivatives=ForwardFD())
 
-xopt, fopt, info = minimize(objective!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, options=options);
+xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt", options=ip_options);
 ```
