@@ -1,67 +1,61 @@
 """
-Test optimization
+Test minimize 2
 """
-
 
 push!(LOAD_PATH,"../joptimise/src/")
 using joptimise
 
 
-function rastrigin(x)
-    A = 10
-    n = length(x)
-    f = A*n
-    for i = 1:n
-        f += x[i]^2 - A*cos(2π*x[i])
-    end
+function rosenbrock(x)
+    f = (1 - x[1])^2 + 100*(x[2] - x[1]^2)^2
     return f
 end
 
 
-function rastrigin!(g, x)
+function rosenbrock!(g, x)
     # compute objective
-    f = rastrigin(x)
-    # upper bounds as constraint
-    g[1] = x[1] - 5.12
-    g[2] = x[2] - 5.12
-    # lower bounds as constraint
-    g[3] = -5.12 - x[1]
-    g[4] = -5.12 - x[2]
+    f = rosenbrock(x)
+    # constraint
+    g[1] = x[1]^2 + x[2]^2 - 1.0
     return f
 end
 
+# initial guess
+x0 = [4.0; 4.0]
+# bounds on variables
+lx = [-5.0; -5.0]
+ux = [5.0; 5.0]
+# bounds on constriants
+lg = [0.0]
+ug = [0.0]
+# number of constraints
+ng = 1
 
-x0 = [-1, 0.1]
-ng = 4   # number of constraints
-#rastrigin!(zeros(ng), x0)
 
-# bounds
-lx = [-5.0, -5.0]
-ux = [5.0, 5.0]
-lg = -Inf*ones(ng);
-ug = zeros(ng);
-
-# ip_options = Dict(
-#     "max_iter" => 2500,   # 1500 ~ 2500
-#     "tol" => 1e-6
-# )
-# solver = IPOPT(ip_options)
-
-snopt_opt = Dict(
-    "Major iterations limit" => 2
+## run minimizer with IPOPT
+ip_options = Dict(
+    "max_iter" => 2500,   # 1500 ~ 2500
+    "tol" => 1e-6
 )
 
-solver = SNOPT(options=snopt_opt)
-options = OptimOptions(;solver=solver, derivatives=ForwardFD())
+xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt", options=ip_options);
 
-# sn_options = Dict(
-#     "Major feasibility tolerance" => 1.e-6
-# )
-# solver = SNOPT(sn_options, "foo", nothing)  #sn_options)
-# options = OptimOptions(;solver=solver, derivatives=ForwardFD())
-println("options: $options")
+println("Done with IPOPT!")
+println(info)
+println(xopt)
 
-# run minimizer
-xopt, fopt, info = minimize(rastrigin!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug)#, options=options);
 
-println("Done!")
+## run minimizer with SNOPT
+sn_options = Dict(
+    "Major feasibility tolerance" => 1.e-6,
+    "Major optimality tolerance"  => 1.e-6,
+    "Minor feasibility tolerance" => 1.e-6,
+    "Major iterations limit" => 1000,
+    "Major print level" => 1,
+)
+
+xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options);
+
+println("Done with SNOPT!")
+println(info)
+println(xopt)
