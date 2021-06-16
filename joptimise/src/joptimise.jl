@@ -22,12 +22,16 @@ include("ipopt_wrap.jl")
 include("snopt_wrap.jl")
 include("Snopt.jl")
 
-# exported functions
+# main call functions
 export minimize
 export snopta
-# export IPOPT
-# export SNOPT
-# export OptimOptions
+
+# derivatives
 export ForwardFD
+export CentralFD
+
+# sparsity
+export DensePattern
+export SparsePattern
 
 end

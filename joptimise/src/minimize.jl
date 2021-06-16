@@ -16,7 +16,7 @@ end
 
 
 """
-    minimize(func!, x0, ng; kwargs...)
+    minimize(func!::Function, x0::Vector, ng::Int; kwargs...)
 
 Minimize function, common interface to IPOPT and SNOPT
 
@@ -28,24 +28,23 @@ Minimize function, common interface to IPOPT and SNOPT
         end
 
 # Arguments
-    - func! (funciton): fitness function
-    - x0 (Array): initial guess
-    - ng (Float): number of constraints
-    - lx (Array): lower bound on x
-    - ux (Array): upper bound on x
-    - lg (Array): lower bound on constraints
-    - ug (Array): upper bound on constraints
-    - solver
-    - options (Dict): options constructed
-    - sparsity
-    - derivatives
-    - outputfile (boolean): whether to create output file
+    - `func!::Function`: fitness function
+    - `x0::Vector: initial guess
+    - `ng::Int: number of constraints
+    - `lx::Vector: lower bound on x
+    - `ux::Vector: upper bound on x
+    - `lg::Vector: lower bound on constraints
+    - `ug::Vector: upper bound on constraints
+    - `solver::String`: solver, "ipopt" or "snopt"
+    - `options::Dict`: options used by solver
+    - `sparsity::AbstractSparsityPattern`: sparsity pattern, defualt is DensePattern()
+    - `derivatives::AbstractDiffMethod`:
+    - `outputfile::Boolean`: whether to create output file
 
 # Returns
-    - (tuple): xstar, fstar, info
+    - `Tuple`: xstar, fstar, info
 """
-function minimize(func!, x0, ng; kwargs...)
-    #, lx=-Inf, ux=Inf, lg=-Inf, ug=0.0, options=OptimOptions(), outputfile=false)
+function minimize(func!::Function, x0::Vector, ng::Int; kwargs...)
     # unpack values
     lx = _assign_from_kwargs(Dict(kwargs), :lx, -Inf)
     ux = _assign_from_kwargs(Dict(kwargs), :ux, Inf)

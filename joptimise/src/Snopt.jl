@@ -1,4 +1,9 @@
-module Snopt
+"""
+SNOPT wrapper to c++ functions
+Modified from SNOPT7.jl (https://github.com/snopt/SNOPT7.jl)
+and Snopt.jl (https://github.com/byuflowlab/Snopt.jl)
+"""
+module snopt
 
 using SparseArrays
 
@@ -404,24 +409,24 @@ function setmemory(INFO, nf, nx, nxname, nfname, neA, neG, work)
 end
 
 
-"""
-    f, fail = example!(g, df, dg, x, deriv)
-The expected function signature for user functions.
-# Arguments
-- `g::Vector{Float64}`: (output) constraint vector, modified in place
-- `df::Vector{Float64}`: (output) gradient vector, modified in place
-- `dg::Vector{Float64}`: (output) constraint jacobian vector, modified in place.
-    dgi/dxj in order corresponding to sparsity pattern provided to snopt
-    (preferably column major order if dense)
-- `x::Vector{Float64}`: (input) design variables, unmodified
-- `deriv::Bool`: (input) if false snopt does not need derivatives that iteration so you can skip their computation.
-# Returns
-- `f::Float64`: objective value
-- `fail::Bool`: true if function fails to compute at this x
-"""
-function example!(g, df, dg, x)
-    return 0.0, false
-end
+# """
+#     f, fail = example!(g, df, dg, x, deriv)
+# The expected function signature for user functions.
+# # Arguments
+# - `g::Vector{Float64}`: (output) constraint vector, modified in place
+# - `df::Vector{Float64}`: (output) gradient vector, modified in place
+# - `dg::Vector{Float64}`: (output) constraint jacobian vector, modified in place.
+#     dgi/dxj in order corresponding to sparsity pattern provided to snopt
+#     (preferably column major order if dense)
+# - `x::Vector{Float64}`: (input) design variables, unmodified
+# - `deriv::Bool`: (input) if false snopt does not need derivatives that iteration so you can skip their computation.
+# # Returns
+# - `f::Float64`: objective value
+# - `fail::Bool`: true if function fails to compute at this x
+# """
+# function example!(g, df, dg, x)
+#     return 0.0, false
+# end
 
 # wrapper for usrfun (augmented with function pass-in)
 function usrcallback(func!, status_::Ptr{Cint}, nx::Cint, x_::Ptr{Cdouble},
@@ -498,7 +503,9 @@ end
 """
     snopta(func!, x0, lx, ux, lg, ug, rows, cols,
         options=Dict(); A=[], names=Names(), objadd=0.0)
+
 Main function call into snOptA.
+
 # Arguments
     - `func!::function`: follows function signature shown in example!
     - `x0::Vector{Float64}` or `x0::WarmStart`: starting point
