@@ -2,7 +2,7 @@
 Test minimize 2
 """
 
-push!(LOAD_PATH,"../joptimise/src/")
+push!(LOAD_PATH,"../src/")
 using joptimise
 
 
