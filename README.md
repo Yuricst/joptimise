@@ -1,5 +1,5 @@
 # joptimise 
-Julia wrapper to ipopt and snopt, parts borrowed from  [Snow.jl](https://github.com/byuflowlab/SNOW.jl) and [SNOPT7.jl](https://github.com/snopt/SNOPT7.jl). 
+Julia wrapper to [Ipopt](https://coin-or.github.io/Ipopt/) and [SNOPT](https://ccom.ucsd.edu/~optimizers/docs/snopt/), parts borrowed from  [Snow.jl](https://github.com/byuflowlab/SNOW.jl) and [SNOPT7.jl](https://github.com/snopt/SNOPT7.jl). 
 
 :large_blue_circle::white_circle::red_circle:
 
