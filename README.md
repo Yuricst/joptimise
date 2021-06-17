@@ -4,7 +4,7 @@ Julia wrapper to [Ipopt](https://coin-or.github.io/Ipopt/) and [SNOPT](https://c
 :large_blue_circle::white_circle::red_circle:
 
 ## Dependencies
-`Ipopt`, `FiniteDiff`, `SparseArrays`
+`Ipopt`, `FiniteDiff`, `ForwardDiff`, `ReverseDiff`, `SparseArrays`
 
 ## Environment setup
 For using `SNOPT`, users must also have an active license. 
@@ -60,7 +60,7 @@ sn_options = Dict(
     "Major print level" => 1,
 )
 
-xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options);
+xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options)
 ```
 
 or IPOPT
@@ -71,5 +71,11 @@ ip_options = Dict(
     "tol" => 1.e-6
 )
 
-xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt", options=ip_options);
+xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt", options=ip_options)
+```
+
+By default, `minimize()` will compute derivatives of the objective and constraints using forward finite-difference from `ForwardDiff`. This may be altered to central-difference, forward-mode or reverse-mode AD from `ForwardDiff` or `ReverseDiff`. This is passed as the kwargs `derivatives`; the possible options are `ForwardFD`, `CentralFD`, `ForwardAD()`, or `ReverseAD`. For example, if using forward-mode AD, 
+
+```julia
+xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options, derivatives=ForwardAD())
 ```
