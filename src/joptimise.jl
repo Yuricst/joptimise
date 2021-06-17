@@ -7,8 +7,8 @@ module joptimise
 
 using Ipopt
 using FiniteDiff
-# using ForwardDiff
-# using ReverseDiff
+using ForwardDiff
+using ReverseDiff
 using SparseArrays
 #using SparseDiffTools
 #using Zygote
@@ -29,6 +29,9 @@ export snopta
 # derivatives
 export ForwardFD
 export CentralFD
+export ForwardAD
+export ReverseAD
+#export ComplexStep
 
 # sparsity
 export DensePattern

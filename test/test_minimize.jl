@@ -1,8 +1,8 @@
 """
-Test minimize 2
+Test minimize function
 """
 
-push!(LOAD_PATH,"../src/")
+#push!(LOAD_PATH,"../src/")
 using joptimise
 
 
@@ -38,7 +38,7 @@ ip_options = Dict(
     "tol" => 1e-6
 )
 
-xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt", options=ip_options);
+xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt", options=ip_options, derivatives=ForwardAD());
 
 println("Done with IPOPT!")
 println(info)
@@ -54,7 +54,7 @@ sn_options = Dict(
     "Major print level" => 1,
 )
 
-xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options);
+xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options, derivatives=ForwardAD());
 
 println("Done with SNOPT!")
 println(info)

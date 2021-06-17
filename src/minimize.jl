@@ -38,7 +38,7 @@ Minimize function, common interface to IPOPT and SNOPT
     - `solver::String`: solver, "ipopt" or "snopt"
     - `options::Dict`: options used by solver
     - `sparsity::AbstractSparsityPattern`: sparsity pattern, defualt is DensePattern()
-    - `derivatives::AbstractDiffMethod`:
+    - `derivatives::AbstractDiffMethod`: derivative method, ForwardFD() or CentralFD() or ForwardAD() or ReverseAD()
     - `outputfile::Boolean`: whether to create output file
 
 # Returns
@@ -55,6 +55,7 @@ function minimize(func!::Function, x0::Vector, ng::Int; kwargs...)
     sparsity    = _assign_from_kwargs(Dict(kwargs), :sparsity, DensePattern())
     derivatives = _assign_from_kwargs(Dict(kwargs), :derivatives, ForwardFD())
     outputfile  = _assign_from_kwargs(Dict(kwargs), :outputfile, false)
+    verbosity = _assign_from_kwargs(Dict(kwargs), :verbosity, 0)
 
     # initialize number of decision variables
     nx = length(x0)
@@ -66,6 +67,9 @@ function minimize(func!::Function, x0::Vector, ng::Int; kwargs...)
     ug = _resize_bounds(ug, ng)
 
     # create cache
+    if verbosity>0
+        println("derivatives: $derivatives")
+    end
     cache = _create_cache(sparsity, derivatives, func!, nx, ng)
 
     # determine sparsity pattern
