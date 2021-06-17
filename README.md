@@ -74,7 +74,7 @@ ip_options = Dict(
 xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt", options=ip_options)
 ```
 
-By default, `minimize()` will compute derivatives of the objective and constraints using forward finite-difference from `ForwardDiff`. This may be altered to central-difference, forward-mode or reverse-mode AD from `ForwardDiff` or `ReverseDiff`. This is passed as the kwargs `derivatives`; the possible options are `ForwardFD`, `CentralFD`, `ForwardAD()`, or `ReverseAD`. For example, if using forward-mode AD, 
+By default, `minimize()` will compute derivatives of the objective and constraints using forward finite-difference from `ForwardDiff`. This may be altered to central-difference, forward-mode or reverse-mode AD from `ForwardDiff` or `ReverseDiff`. This is passed as the kwargs `derivatives`; the possible options are `ForwardFD()`, `CentralFD()`, `ForwardAD()`, or `ReverseAD()`. For example, if using forward-mode AD, 
 
 ```julia
 xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options, derivatives=ForwardAD())
