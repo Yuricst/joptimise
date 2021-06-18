@@ -398,14 +398,14 @@ function setmemory(INFO, nf, nx, nxname, nfname, neA, neG, work)
     for (key,value) in zip(memkey, memvalue)
         buffer = string(key, repeat(" ", 55-length(key)))  # buffer length is 55 so pad with space.
         errors[1] = 0
-        # ccall( (:snseti_, snoptlib), Nothing,
-        #     (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
-        #     Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-        #     buffer, value, PRINTNUM, SUMNUM, errors,
-        #     work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
-        # if errors[1] > 0
-        #     @warn errors[1], " error encountered while lengths in options from memory sizing"
-        # end
+        ccall( (:f_snseti, snoptlib), Nothing,
+            (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
+            Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
+            buffer, value, PRINTNUM, SUMNUM, errors,
+            work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
+        if errors[1] > 0
+            @warn errors[1], " error encountered while lengths in options from memory sizing"
+        end
     end
 
     return nothing
