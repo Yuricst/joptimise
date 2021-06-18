@@ -196,11 +196,14 @@ end
 function sninit(nx, nf)
 
     # temporary working arrays
-    minlen = 500
+    minlen = 25000
     lencw = minlen
     leniw = minlen + 100*(nx + nf)
     lenrw = minlen + 200*(nx + nf)
     w = Workspace(lencw, leniw, lenrw)
+    println("lencw: $lencw")
+    println("leniw: $leniw")
+    println("lenrw: $lenrw")
 
     ccall( (:sninit_, snoptlib), Nothing,
         (Ref{Cint}, Ref{Cint}, Ptr{Cuchar}, Ref{Cint}, Ptr{Cint},
