@@ -55,7 +55,8 @@ function minimize(func!::Function, x0::Vector, ng::Int; kwargs...)
     sparsity    = _assign_from_kwargs(Dict(kwargs), :sparsity, DensePattern())
     derivatives = _assign_from_kwargs(Dict(kwargs), :derivatives, ForwardFD())
     outputfile  = _assign_from_kwargs(Dict(kwargs), :outputfile, false)
-    verbosity = _assign_from_kwargs(Dict(kwargs), :verbosity, 0)
+    verbosity   = _assign_from_kwargs(Dict(kwargs), :verbosity, 0)
+    lencw       = _assign_from_kwargs(Dict(kwargs), :lencw, 500)
 
     # initialize number of decision variables
     nx = length(x0)
@@ -78,7 +79,7 @@ function minimize(func!::Function, x0::Vector, ng::Int; kwargs...)
     if cmp(solver, "ipopt") == 0
         xstar, fstar, info = minimize_ipopt(options, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
     elseif cmp(solver, "snopt") == 0
-        xstar, fstar, info = minimize_snopt(options, cache, x0, lx, ux, lg, ug, rows, cols, outputfile)
+        xstar, fstar, info = minimize_snopt(options, cache, x0, lx, ux, lg, ug, rows, cols, outputfile, lencw)
     end
     return xstar, fstar, info
 end

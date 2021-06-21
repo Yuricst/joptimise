@@ -192,14 +192,23 @@ struct Outputs{TF,TI,TW}
 end
 
 
-# wrapper for snInit
-function sninit(nx, nf)
+"""
+    sninit(nx, nf, lencw=500)
+
+wrapper for snInit
+
+# Arguments
+    - `nx::Int`: number of variables
+    - `nf::Int`: number of objective (1) + constraints
+    - `lencw::Int`: character length, default is 500 as per docs
+"""
+function sninit(nx, nf, lencw=500)
 
     # temporary working arrays
-    minlen = 25000
-    lencw = minlen
-    leniw = minlen + 100*(nx + nf)
-    lenrw = minlen + 200*(nx + nf)
+    #minlen = 25000
+    #lencw = minlen
+    leniw = lencw + 100*(nx + nf)
+    lenrw = lencw + 200*(nx + nf)
     w = Workspace(lencw, leniw, lenrw)
     println("lencw: $lencw")
     println("leniw: $leniw")
@@ -493,19 +502,18 @@ function parseAmatrix(A)
 end
 
 
-# commonly used convenience method to provide regular starting point (cold start)
-function snopta(func!, x0::T, lx, ux, lg, ug, rows, cols,
-    options=Dict(); A=[], names=Names(), objadd=0.0) where T<:Vector
-
-    start = ColdStart(x0, length(lg)+1)
-
-    return snopta(func!, start, lx, ux, lg, ug, rows, cols, options, A=A, names=names, objadd=objadd)
-end
+# # commonly used convenience method to provide regular starting point (cold start)
+# function snopta(func!, x0::T, lx, ux, lg, ug, rows, cols,
+#     options=Dict(); A=[], names=Names(), objadd=0.0) where T<:Vector
+#
+#     start = ColdStart(x0, length(lg)+1)
+#
+#     return snopta(func!, start, lx, ux, lg, ug, rows, cols, options, A=A, names=names, objadd=objadd)
+# end
 
 
 """
-    snopta(func!, x0, lx, ux, lg, ug, rows, cols,
-        options=Dict(); A=[], names=Names(), objadd=0.0)
+    snopta(func!, x0, lx, ux, lg, ug, rows, cols; kwargs...)
 
 Main function call into snOptA.
 
@@ -522,6 +530,7 @@ Main function call into snOptA.
     - `A::Matrix` (if dense) or `SparseMatrixCSC`: linear constraints g += A*x
     - `names::Names`: custom names for problem and variables for print file
     - `objAdd::Float64`: adds a scalar to objective (see Snopt docs)
+    - `lencw::Int`: length of 8-character workspace, default is 500
 
 # Returns
     - `xstar::Vector{Float64}`: optimal x
@@ -529,8 +538,15 @@ Main function call into snOptA.
     - `info::String`: termination message
     - `out::Outputs`: various outputs
 """
-function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols,
-    options=Dict(); A=[], names=Names(), objadd=0.0)
+function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols; kwargs...)
+    #options=Dict(); A=[], names=Names(), objadd=0.0, minlen=500)
+
+    # unpack values
+    options = _assign_from_kwargs(Dict(kwargs), :options, Dict())
+    A       = _assign_from_kwargs(Dict(kwargs), :A, [])
+    names   = _assign_from_kwargs(Dict(kwargs), :names, Names())
+    objadd  = _assign_from_kwargs(Dict(kwargs), :objadd, 0.0)
+    lencw   = _assign_from_kwargs(Dict(kwargs), :lencw, 500)
 
     # --- number of functions ----
     nx = length(start.x)
@@ -609,7 +625,7 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols,
     #openfiles(printfile, sumfile)
 
     # ----- initialize -------
-    work = sninit(nx, nf)
+    work = sninit(nx, nf, lencw)
 
     # --- set options ----
     setoptions(options, work)   # FIXME!
@@ -643,7 +659,7 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols,
         Ptr{Cint}, Ptr{Cint}, Ptr{Cdouble},
         Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint},
         Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-        start.start, nf, nx, nxname, nfname,  # Start, nf, n, nxname, nfname
+        start.start, nf, nx, nxname, nfname,
         objadd, objrow, names.prob, usrfun,
         iAfun, jAvar, lenA, neA, Aval,
         iGfun, jGvar, lenG, neG,
