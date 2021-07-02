@@ -15,7 +15,7 @@ end
 """
 Run example
 """
-function example(solve_ipopt::Bool=true, solve_snopt::Bool=false)
+function rosenbrock(solve_ipopt::Bool=true, solve_snopt::Bool=false)
     # initial guess
     x0 = [4.0; 4.0]
     # bounds on variables
