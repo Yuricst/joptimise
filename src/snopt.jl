@@ -171,15 +171,17 @@ Workspace(lenc, leni, lenr) = Workspace(
 
 """
     Outputs(gstar, iterations, major_iter, run_time, nInf, sInf, warm)
+
 Outputs returned by the snopta function.
+
 # Arguments
-- `gstar::Vector{Float}`: constraints evaluated at the optimal point
-- `iterations::Int`: total iteration count
-- `major_iter::Int`: number of major iterations
-- `run_time::Float`: solve time as reported by snopt
-- `nInf::Int`: number of infeasibility constraints, see snopta docs
-- `sInf::Float`: sum of infeasibility constraints, see snopta docs
-- `warm::WarmStart`: a warm start object that can be used in a restart.
+    - `gstar::Vector{Float}`: constraints evaluated at the optimal point
+    - `iterations::Int`: total iteration count
+    - `major_iter::Int`: number of major iterations
+    - `run_time::Float`: solve time as reported by snopt
+    - `nInf::Int`: number of infeasibility constraints, see snopta docs
+    - `sInf::Float`: sum of infeasibility constraints, see snopta docs
+    - `warm::WarmStart`: a warm start object that can be used in a restart.
 """
 struct Outputs{TF,TI,TW}
     gstar::Vector{TF}
@@ -283,29 +285,13 @@ function setoptions(options, work)
 
         if typeof(value) == String
             setOption!(work, value)
-        #     value = string(value, repeat(" ", 72-length(value)))
-        #
-        #     ccall( (:snset_, snoptlib), Nothing,
-        #         (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
-        #         Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-        #         value, PRINTNUM, SUMNUM, errors,
-        #         work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
-        #
+
         elseif isinteger(value)
             setOption!(work, key, value)
-        #     ccall( (:snseti_, snoptlib), Nothing,
-        #         (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
-        #         Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-        #         buffer, value, PRINTNUM, SUMNUM, errors,
-        #         work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
-        #
+
         elseif isreal(value)
             setOption!(work, key, value)
-        #     ccall( (:snsetr_, snoptlib), Nothing,
-        #         (Ptr{Cuchar}, Ref{Cdouble}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
-        #         Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-        #         buffer, value, PRINTNUM, SUMNUM, errors,
-        #         work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
+
         end
 
         if errors[1] > 0
