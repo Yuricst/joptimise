@@ -81,3 +81,78 @@
  Smallest constant element        0.0000E+00   free rows, and RHS)
 
  No. of objective coefficients             0
+
+ Nonlinear constraints       1     Linear constraints       1
+ Nonlinear variables         2     Linear variables         0
+ Jacobian  variables         2     Objective variables      2
+ Total constraints           2     Total variables          2
+1
+
+
+
+ The user has defined       4   out of       4   first  derivatives
+
+ Cheap test of user-supplied problem derivatives...
+
+ The constraint gradients seem to be OK.
+
+ -->  The largest discrepancy was    5.63E-07  in constraint     4
+
+
+ The objective  gradients seem to be OK.
+
+ Gradient projected in one direction  -2.04983159168E-02
+ Difference approximation             -2.02800207502E-02
+1
+
+
+
+   Itns Major Minors    Step   nCon Feasible  Optimal  MeritFunction     L+U BSwap     nS condZHZ Penalty
+      1     0      1              1 (8.5E-12) 1.0E-06  4.5674809E-02       2            1 2.0E+00         _  r
+      2     1      1 1.0E-03      3 (8.5E-12)(5.1E-07) 4.5674809E-02       2            1 3.6E+00 1.9E+10 _  r
+1
+
+ SNOPTA EXIT   0 -- finished successfully
+ SNOPTA INFO   1 -- optimality conditions satisfied
+
+ Problem name                 Opt Prob
+ No. of iterations                   2   Objective            4.5674808718E-02
+ No. of major iterations             1   Linear    obj. term  0.0000000000E+00
+ Penalty parameter           1.921E+10   Nonlinear obj. term  4.5674808718E-02
+ User function calls (total)         4
+ No. of superbasics                  1   No. of basic nonlinears             1
+ No. of degenerate steps             0   Percentage                       0.00
+ Max x                       1 7.9E-01   Max pi                      2 1.0E+00
+ Max Primal infeas           4 8.5E-12   Max Dual infeas             2 5.1E-07
+ Nonlinear constraint violn    8.5E-12
+1
+
+ Name           Opt Prob                 Objective Value      4.5674808718E-02
+
+ Status         Optimal Soln             Iteration      2    Superbasics     1
+
+ Objective               (Min)
+ RHS
+ Ranges
+ Bounds
+
+ Section 1 - Constraints
+
+  Number  ...Row.. State  ...Value......  Slack Value...  ..Lower Limit.  ..Upper Limit.  .Dual Variable    ..i
+
+       3  r      1    BS          .               .                None            None           .           1
+       4  r      2    EQ         0.00000         0.00000          .               .             -0.12150      2
+1
+
+ Section 2 - Variables
+
+  Number  .Column. State  ...Value......  .Obj Gradient.  ..Lower Limit.  ..Upper Limit.  .Dual Variable    m+j
+
+       1  x      1    BS         0.78642        -0.19109        -5.00000         5.00000         0.00000      3
+       2  x      2   SBS         0.61770        -0.15010        -5.00000         5.00000        -0.00000      4
+
+ Time for MPS input                             0.00 seconds
+ Time for solving problem                       0.03 seconds
+ Time for solution output                       0.00 seconds
+ Time for constraint functions                  0.03 seconds
+ Time for objective function                    0.00 seconds
