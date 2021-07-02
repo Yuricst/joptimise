@@ -13,9 +13,11 @@ end
 
 
 """
-Run example
+    joptimise_rosenbrock(solve_ipopt::Bool=true, solve_snopt::Bool=false)
+
+Run example with rosenbrock function
 """
-function rosenbrock(solve_ipopt::Bool=true, solve_snopt::Bool=false)
+function joptimise_rosenbrock(solve_ipopt::Bool=true, solve_snopt::Bool=false)
     # initial guess
     x0 = [4.0; 4.0]
     # bounds on variables

@@ -38,4 +38,7 @@ export ReverseAD
 export DensePattern
 export SparsePattern
 
+# examples
+export joptimise_rosenbrock
+
 end
