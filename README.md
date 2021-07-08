@@ -81,3 +81,7 @@ By default, `minimize()` will compute derivatives of the objective and constrain
 ```julia
 xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options, derivatives=ForwardAD())
 ```
+
+## Todo
+- [ ] user-specified derivative
+- [ ] optional output file using SNOPT
