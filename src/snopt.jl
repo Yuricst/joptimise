@@ -1,5 +1,5 @@
 """
-SNOPT wrapper to c++ functions
+SNOPT wrapper
 Modified from SNOPT7.jl (https://github.com/snopt/SNOPT7.jl)
 and Snopt.jl (https://github.com/byuflowlab/Snopt.jl)
 """
@@ -204,7 +204,7 @@ wrapper for snInit
     - `nf::Int`: number of objective (1) + constraints
     - `lencw::Int`: character length, default is 500 as per docs
 """
-function sninit(nx, nf, lencw=500)
+function sninit(nx, nf, lencw=500, iSumm::Int=19)
 
     # temporary working arrays
     #minlen = 25000
@@ -219,7 +219,7 @@ function sninit(nx, nf, lencw=500)
     ccall( (:sninit_, snoptlib), Nothing,
         (Ref{Cint}, Ref{Cint}, Ptr{Cuchar}, Ref{Cint}, Ptr{Cint},
         Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-        PRINTNUM, SUMNUM, w.cw, w.lencw, w.iw,
+        PRINTNUM, iSumm, w.cw, w.lencw, w.iw,
         w.leniw, w.rw, w.lenrw)
 
     return w
@@ -517,6 +517,7 @@ Main function call into snOptA.
     - `names::Names`: custom names for problem and variables for print file
     - `objAdd::Float64`: adds a scalar to objective (see Snopt docs)
     - `lencw::Int`: length of 8-character workspace, default is 500
+    - `iSumm::Int`: unit-number for summary file, default is 6
 
 # Returns
     - `xstar::Vector{Float64}`: optimal x
@@ -533,6 +534,7 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols; kwargs...)
     names   = _assign_from_kwargs(Dict(kwargs), :names, Names())
     objadd  = _assign_from_kwargs(Dict(kwargs), :objadd, 0.0)
     lencw   = _assign_from_kwargs(Dict(kwargs), :lencw, 500)
+    iSumm   = _assign_from_kwargs(Dict(kwargs), :iSumm, 6)
 
     # --- number of functions ----
     nx = length(start.x)
@@ -611,7 +613,7 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols; kwargs...)
     #openfiles(printfile, sumfile)
 
     # ----- initialize -------
-    work = sninit(nx, nf, lencw)
+    work = sninit(nx, nf, lencw, iSumm)
 
     # --- set options ----
     setoptions(options, work)   # FIXME!
