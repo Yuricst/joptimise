@@ -20,12 +20,14 @@ end
 
 Minimize function, common interface to IPOPT and SNOPT
 
-    Objective function structure:
+Objective function structure:
 
-        function func!(g, x)
-            <modify g>
-            return <objective value>
-        end
+```julia
+function func!(g, x)
+    <modify g>
+    return <objective value to be minimized>
+end
+```
 
 # Arguments
     - `func!::Function`: fitness function
@@ -40,6 +42,7 @@ Minimize function, common interface to IPOPT and SNOPT
     - `sparsity::AbstractSparsityPattern`: sparsity pattern, defualt is DensePattern()
     - `derivatives::AbstractDiffMethod`: derivative method, ForwardFD() or CentralFD() or ForwardAD() or ReverseAD()
     - `outputfile::Boolean`: whether to create output file
+    - `verbosity::Int`: verbosirty level, >= 0
 
 # Returns
     - `Tuple`: xstar, fstar, info
@@ -56,8 +59,10 @@ function minimize(func!::Function, x0::Vector, ng::Int; kwargs...)
     derivatives = _assign_from_kwargs(Dict(kwargs), :derivatives, ForwardFD())
     outputfile  = _assign_from_kwargs(Dict(kwargs), :outputfile, false)
     verbosity   = _assign_from_kwargs(Dict(kwargs), :verbosity, 0)
+
+    # snopt-specific settings
     lencw       = _assign_from_kwargs(Dict(kwargs), :lencw, 500)
-    iSumm       = _assign_from_kwargs(Dict(kwargs), :iSumm, 6)
+    iSumm       = _assign_from_kwargs(Dict(kwargs), :iSumm, 6)   # print to screen if 6
 
     # initialize number of decision variables
     nx = length(x0)
@@ -82,6 +87,8 @@ function minimize(func!::Function, x0::Vector, ng::Int; kwargs...)
     elseif cmp(solver, "snopt") == 0
         xstar, fstar, info = minimize_snopt(options, cache, x0, lx, ux, lg, ug, rows, cols, outputfile, lencw, iSumm)
     end
+    print("typeof-cache: ")
+    println(typeof(cache))
     return xstar, fstar, info
 end
 

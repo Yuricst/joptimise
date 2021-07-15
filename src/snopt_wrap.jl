@@ -12,7 +12,7 @@ Minimize function interfacing to snopta() routine
 # Arguments
     - `cache::AbstractSolver`: cache created using _create_cache()
 """
-function minimize_snopt(options, cache, x0, lx, ux, lg, ug, rows, cols,
+function minimize_snopt(options::Dict, cache, x0, lx, ux, lg, ug, rows, cols,
             outputfile::Bool, lencw::Int=500, iSumm::Int=6)
 
     # define objective function for SNOPT

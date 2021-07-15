@@ -9,12 +9,12 @@ Ipopt wrapper
 Minimize function interfacing to IPOPT
 
 # Arguments
-    - `cache`: cache created using _create_cache()
+    - `cache::GradOrJacCache`: cache created using _create_cache()
 
 Nanami's Function = {red wine + accounting + driving + Bay Area + singing + eating out + coffee + pesto genovese + strawberry + mango + cinnamon roll + french toast + Korean food^(Faily and Friednds)}
 The most difficult function on the planet
 """
-function minimize_ipopt(options, cache, x0, lx, ux, lg, ug, rows, cols, outputfile::Bool)
+function minimize_ipopt(options::Dict, cache, x0, lx, ux, lg, ug, rows, cols, outputfile::Bool)
 
     # initialize
     nx = length(x0)

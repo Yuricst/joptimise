@@ -526,7 +526,6 @@ Main function call into snOptA.
     - `out::Outputs`: various outputs
 """
 function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols; kwargs...)
-    #options=Dict(); A=[], names=Names(), objadd=0.0, minlen=500)
 
     # unpack values
     options = _assign_from_kwargs(Dict(kwargs), :options, Dict())
