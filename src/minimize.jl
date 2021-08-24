@@ -74,9 +74,9 @@ function minimize(func!::Function, x0::Vector, ng::Int; kwargs...)
     ug = _resize_bounds(ug, ng)
 
     # create cache
-    if verbosity>0
-        println("derivatives: $derivatives")
-    end
+    # if verbosity>0
+    #     println("derivatives: $derivatives")
+    # end
     cache = _create_cache(sparsity, derivatives, func!, nx, ng)
 
     # determine sparsity pattern
