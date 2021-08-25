@@ -87,8 +87,8 @@ function minimize(func!::Function, x0::Vector, ng::Int; kwargs...)
     elseif cmp(solver, "snopt") == 0
         xstar, fstar, info = minimize_snopt(options, cache, x0, lx, ux, lg, ug, rows, cols, outputfile, lencw, iSumm)
     end
-    print("typeof-cache: ")
-    println(typeof(cache))
+    #print("typeof-cache: ")
+    #println(typeof(cache))
     return xstar, fstar, info
 end
 
