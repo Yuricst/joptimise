@@ -153,6 +153,6 @@
 
  Time for MPS input                             0.00 seconds
  Time for solving problem                       0.03 seconds
- Time for solution output                       0.03 seconds
+ Time for solution output                       0.00 seconds
  Time for constraint functions                  0.03 seconds
  Time for objective function                    0.00 seconds
