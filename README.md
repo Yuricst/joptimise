@@ -68,8 +68,9 @@ or IPOPT
 
 ```julia
 ip_options = Dict(
-    "max_iter" => 2500,   # 1500 ~ 2500
-    "tol" => 1.e-6
+    "max_iter" => 2500,
+    "tol" => 1e-6,
+    "print_level" => 5,
 )
 
 xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt", options=ip_options)
