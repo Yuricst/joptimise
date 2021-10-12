@@ -23,6 +23,7 @@ docs/site/
 # environment.
 Manifest.toml
 
+
 # output files
 *.out
-fort.*
+fort*.*

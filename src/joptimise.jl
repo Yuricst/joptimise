@@ -20,7 +20,7 @@ include("minimize.jl")
 include("cache.jl")
 include("ipopt_wrap.jl")
 include("snopt_wrap.jl")
-include("Snopt.jl")
+include("snopt.jl")
 include("example.jl")
 
 # main call functions

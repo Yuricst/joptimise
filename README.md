@@ -1,5 +1,6 @@
 # joptimise 
-Julia wrapper to [Ipopt](https://coin-or.github.io/Ipopt/) and [SNOPT](https://ccom.ucsd.edu/~optimizers/docs/snopt/), parts borrowed from  [Snow.jl](https://github.com/byuflowlab/SNOW.jl) and [SNOPT7.jl](https://github.com/snopt/SNOPT7.jl). 
+`joptimise` (Fr: j'optimise) is a Julia wrapper to [Ipopt](https://coin-or.github.io/Ipopt/) and [SNOPT](https://ccom.ucsd.edu/~optimizers/docs/snopt/) for solving nonlinear programming problems with gradient methods. 
+Parts borrowed from  [Snow.jl](https://github.com/byuflowlab/SNOW.jl) and [SNOPT7.jl](https://github.com/snopt/SNOPT7.jl). 
 
 :large_blue_circle::white_circle::red_circle:
 
@@ -67,8 +68,9 @@ or IPOPT
 
 ```julia
 ip_options = Dict(
-    "max_iter" => 2500,   # 1500 ~ 2500
-    "tol" => 1.e-6
+    "max_iter" => 2500,
+    "tol" => 1e-6,
+    "print_level" => 5,
 )
 
 xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt", options=ip_options)
