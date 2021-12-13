@@ -1,0 +1,12 @@
+language: julia
+
+
+jobs:
+  include:
+    - stage: "Documentation"
+      julia: 1.7
+      os: windows
+      script:
+        - julia --color=yes --project=docs/ -e 'using Pkg; Pkg.instantiate()'
+        - julia --color=yes --project=docs/ docs/make.jl
+      after_success: skip
