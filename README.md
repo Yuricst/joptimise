@@ -2,7 +2,9 @@
 `joptimise` (Fr: j'optimise) is a Julia wrapper to [Ipopt](https://coin-or.github.io/Ipopt/) and [SNOPT](https://ccom.ucsd.edu/~optimizers/docs/snopt/) for solving nonlinear programming problems with gradient methods. 
 Parts borrowed from  [Snow.jl](https://github.com/byuflowlab/SNOW.jl) and [SNOPT7.jl](https://github.com/snopt/SNOPT7.jl). 
 
-:large_blue_circle::white_circle::red_circle:
+<p align="center">
+  <img src="./docs/src/assets/logo.svg" width="550" title="joptimise-logo">
+</p>
 
 ## Dependencies
 `Ipopt`, `FiniteDiff`, `ForwardDiff`, `ReverseDiff`, `SparseArrays`
