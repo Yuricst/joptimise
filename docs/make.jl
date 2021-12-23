@@ -22,7 +22,10 @@ makedocs(
 		"Home" => "index.md",
 		"Examples" => "examples.md",
 		"API" => "api.md",
-	]
+	],
+	assets=[
+        "assets/logo.png",
+    ],
 )
 
 
