@@ -22,6 +22,7 @@ include("ipopt_wrap.jl")
 include("snopt_wrap.jl")
 include("snopt.jl")
 include("example.jl")
+include("initial_guess.jl")
 
 # main call functions
 export minimize
@@ -37,6 +38,9 @@ export ReverseAD
 # sparsity
 export DensePattern
 export SparsePattern
+
+# initial guess generator
+export random_initial_guess
 
 # examples
 export joptimise_rosenbrock
