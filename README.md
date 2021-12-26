@@ -1,5 +1,5 @@
 # joptimise 
-`joptimise` (Fr: j'optimise) is a Julia wrapper to [Ipopt](https://coin-or.github.io/Ipopt/) and [SNOPT](https://ccom.ucsd.edu/~optimizers/docs/snopt/) for solving nonlinear programming problems with gradient methods. 
+`joptimise.jl` (Fr: j'optimise) is a Julia wrapper to [Ipopt](https://coin-or.github.io/Ipopt/) and [SNOPT](https://ccom.ucsd.edu/~optimizers/docs/snopt/) for solving nonlinear programming problems with gradient methods. 
 Parts borrowed from  [Snow.jl](https://github.com/byuflowlab/SNOW.jl) and [SNOPT7.jl](https://github.com/snopt/SNOPT7.jl). 
 
 <p align="center">
