@@ -7,7 +7,7 @@ Wrapper for minimization function
 """
 Method to resize bounds if float is passed
 """
-function _resize_bounds(lx, nx)
+function _resize_bounds(lx, nx::Int)
     if length(lx) == 1 && nx > 1
         lx = lx*ones(nx)
     end
