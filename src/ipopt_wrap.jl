@@ -63,15 +63,42 @@ function minimize_ipopt(options::Dict, cache, x0, lx, ux, lg, ug, rows, cols, ou
         return nothing
     end
 
+    function ipjac_con(x, r, c, values)
+        if !isequal(x, xlast)
+            f = evaluate!(g, df, dg, x, cache)
+            xlast = x
+        end
+        values[:] = dg
+        return nothing
+    end
+
     nzJ = length(rows)
     nH = 1  # irrelevant for quasi-newton
-    prob = Ipopt.createProblem(nx, lx, ux, ng, lg, ug, nzJ, nH,
-        ipobj, ipcon, ipgrad_obj, ipjac_con)
+    #prob = Ipopt.createProblem(
+    prob = Ipopt.CreateIpoptProblem(
+        nx,  # n
+        lx,  # x_L
+        ux,  # x_U
+        ng,  # m
+        lg,  # g_L
+        ug,  # g_U
+        nzJ, # nele_jac
+        nH,  # nele_hess
+        ipobj,  # eval_f
+        ipcon,  # eval_g
+        ipgrad_obj,  # eval_grad_f
+        ipjac_con,   # eval_jac_g
+        nothing,     # eval_h
+    )
 
     # set Ipopt options
-    Ipopt.addOption(prob, "hessian_approximation", "limited-memory")
+    AddIpoptOption(prob, "hessian_approximation", "limited-memory")
+    #Ipopt.addOption(prob, "hessian_approximation", "limited-memory")
+
+    # additional optional options
     for (key, value) in options
-        Ipopt.addOption(prob, key, value)
+        AddIpoptOption(prob, key, value)
+        #Ipopt.addOption(prob, key, value)
     end
 
     # open output file
@@ -86,16 +113,39 @@ function minimize_ipopt(options::Dict, cache, x0, lx, ux, lg, ug, rows, cols, ou
             print_level = options["print_level"]
         end
         # create Ipopt output file
-        Ipopt.openOutputFile(prob, filename, print_level)
+        Ipopt.OpenIpoptOutputFile(prob, filename, print_level)
+        #Ipopt.openOutputFile(prob, filename, print_level)
     end
 
     # solve problem
     prob.x = x0
-    status = solveProblem(prob)
+    status = IpoptSolve(prob) #solveProblem(prob)
 
     # return xstar, fstar, info
     xstar = prob.x
     fstar = prob.obj_val
     info  = Ipopt.ApplicationReturnStatus[status]
     return xstar, fstar, info
+end
+
+
+"""
+Type-specific ipopt add option function
+"""
+function AddIpoptOption(prob::IpoptProblem, keyword::String, value::String)
+    return Ipopt.AddIpoptStrOption(prob, keyword, value)
+end
+
+"""
+Type-specific ipopt add option function
+"""
+function AddIpoptOption(prob::IpoptProblem, keyword::String, value::Int)
+    return Ipopt.AddIpoptIntOption(prob, keyword, value)
+end
+
+"""
+Type-specific ipopt add option function
+"""
+function AddIpoptOption(prob::IpoptProblem, keyword::String, value::Float64)
+    return Ipopt.AddIpoptNumOption(prob, keyword, value)
 end
