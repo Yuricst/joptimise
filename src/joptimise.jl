@@ -41,4 +41,7 @@ export SparsePattern
 # examples
 export joptimise_rosenbrock
 
+# hangling output files
+export process_ipopt_out
+
 end

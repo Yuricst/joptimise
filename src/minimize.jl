@@ -30,7 +30,7 @@ end
 ```
 
 # Arguments
-    - `func!::Function`: fitness function
+    - `func!::Function`: fitness function with signature `rosenbrock!(g, x)` and returning objective
     - `x0::Vector: initial guess
     - `ng::Int: number of constraints
     - `lx::Vector: lower bound on x
