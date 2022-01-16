@@ -99,3 +99,40 @@ function minimize_ipopt(options::Dict, cache, x0, lx, ux, lg, ug, rows, cols, ou
     info  = Ipopt.ApplicationReturnStatus[status]
     return xstar, fstar, info
 end
+
+
+"""
+    process_ipopt_out(filename::String)
+
+Process ipopt output file
+"""
+function process_ipopt_out(filename::String)
+    # get lines
+    lines = []
+    open(filename) do f
+        # read till end of file
+        while ! eof(f)
+            # read a new / next line for every iteration
+            line = readline(f)
+            push!(lines, line)
+        end
+    end
+    # process
+    nlines = length(lines)
+    res = Dict(
+        "n_iter" => parse(Int64, lines[nlines-20][26:end]),
+        "n_obj_func_eval" =>  parse(Int64, lines[nlines-10][56:end]),
+        "n_obj_grad_eval" =>  parse(Int64, lines[nlines-9][56:end]),
+        "n_neqc_eval" =>      parse(Int64, lines[nlines-8][56:end]),
+        "n_nieqc_eval" =>     parse(Int64, lines[nlines-7][56:end]),
+        "n_neqc_jac_eval" =>  parse(Int64, lines[nlines-6][56:end]),
+        "n_nieqc_jac_eval" => parse(Int64, lines[nlines-5][56:end]),
+        "n_lagrange_hessian" => parse(Int64, lines[nlines-4][56:end]),
+        "t_cpu_sec_ipopt" => parse(Float64, lines[nlines-3][56:end]),
+        "t_cpu_sec_nlp"   => parse(Float64, lines[nlines-2][56:end]),
+        "EXIT"   => lines[nlines][7:end],
+        "t_cpu" => parse(Float64, lines[nlines-2][56:end])+parse(Float64, lines[nlines-3][56:end]),
+        "objective" => parse(Float64, lines[end-17][53:end]),
+    )
+    return lines, res
+end
