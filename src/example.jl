@@ -50,6 +50,8 @@ function joptimise_rosenbrock(solve_ipopt::Bool=true, solve_snopt::Bool=false)
             "Minor feasibility tolerance" => 1.e-6,
             "Major iterations limit" => 1000,
             "Major print level" => 1,
+            "Print file" => "snopt_test.out",
+            "Summary file" => "screen",
         )
         xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options, derivatives=ForwardAD());
 

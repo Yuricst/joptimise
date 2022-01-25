@@ -194,6 +194,38 @@ struct Outputs{TF,TI,TW}
 end
 
 
+# """
+#     sninit(nx, nf, lencw=500)
+#
+# wrapper for snInit
+#
+# # Arguments
+#     - `nx::Int`: number of variables
+#     - `nf::Int`: number of objective (1) + constraints
+#     - `lencw::Int`: character length, default is 500 as per docs
+# """
+# function sninit(nx, nf, lencw=500, iSumm::Int=6)
+#
+#     # temporary working arrays
+#     #minlen = 25000
+#     #lencw = minlen
+#     leniw = lencw + 100*(nx + nf)
+#     lenrw = lencw + 200*(nx + nf)
+#     w = Workspace(lencw, leniw, lenrw)
+#     println("lencw: $lencw")
+#     println("leniw: $leniw")
+#     println("lenrw: $lenrw")
+#
+#     ccall( (:sninit_, snoptlib), Nothing,
+#         (Ref{Cint}, Ref{Cint}, Ptr{Cuchar}, Ref{Cint}, Ptr{Cint},
+#         Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
+#         PRINTNUM, iSumm, w.cw, w.lencw, w.iw,
+#         w.leniw, w.rw, w.lenrw)
+#
+#     return w
+# end
+
+
 """
     sninit(nx, nf, lencw=500)
 
@@ -203,8 +235,11 @@ wrapper for snInit
     - `nx::Int`: number of variables
     - `nf::Int`: number of objective (1) + constraints
     - `lencw::Int`: character length, default is 500 as per docs
+Following:
+https://github.com/snopt/SNOPT7.jl/blob/master/src/SNOPT7.jl#L145
 """
-function sninit(nx, nf, lencw=500, iSumm::Int=19)
+function sninit(printfile::String, summfile::String,
+    nx, nf, lencw=500, iSumm::Int=6)
 
     # temporary working arrays
     #minlen = 25000
@@ -216,12 +251,66 @@ function sninit(nx, nf, lencw=500, iSumm::Int=19)
     println("leniw: $leniw")
     println("lenrw: $lenrw")
 
-    ccall( (:sninit_, snoptlib), Nothing,
-        (Ref{Cint}, Ref{Cint}, Ptr{Cuchar}, Ref{Cint}, Ptr{Cint},
-        Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-        PRINTNUM, iSumm, w.cw, w.lencw, w.iw,
-        w.leniw, w.rw, w.lenrw)
+    # ccall( (:sninit_, snoptlib), Nothing,
+    #     (Ref{Cint}, Ref{Cint}, Ptr{Cuchar}, Ref{Cint}, Ptr{Cint},
+    #     Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
+    #     PRINTNUM, iSumm, w.cw, w.lencw, w.iw,
+    #     w.leniw, w.rw, w.lenrw)
+    # ccall((:f_sninitx, snoptlib), Cvoid,
+    #       (Ptr{UInt8}, Cint, Cint,
+    #        Ptr{UInt8}, Cint, Cint,
+    #        Ptr{Cint}, Cint, Ptr{Cdouble}, Cint),
+    #       printfile, plen, w.iprint, summfile, slen, w.isumm,
+    #       w.iw, w.leniw, w.rw, w.lenrw)
+    ccall((:f_sninitx, snoptlib), Cvoid,
+        (Ptr{UInt8}, Cint, Ptr{UInt8}, Cint,
+         Ptr{Cint}, Cint, Ptr{Cdouble}, Cint),
+        printfile, length(printfile), summfile, length(summfile),
+        w.iw, w.leniw, w.rw, w.lenrw)
+    return w
+end
 
+
+"""
+    sninitf(nx, nf, lencw=500)
+
+wrapper for sninitf
+
+# Arguments
+    - `nx::Int`: number of variables
+    - `nf::Int`: number of objective (1) + constraints
+    - `lencw::Int`: character length, default is 500 as per docs
+"""
+function sninitf(printfile, sumfile, nx, nf, lencw=500, iSumm::Int=6)
+
+    # temporary working arrays
+    #minlen = 25000
+    #lencw = minlen
+    leniw = lencw + 100*(nx + nf)
+    lenrw = lencw + 200*(nx + nf)
+    w = Workspace(lencw, leniw, lenrw)
+    println("printfile: $printfile")
+    println("sumfile: $sumfile")
+
+    ccall( (:sninitf_, snoptlib), Nothing,
+        (Ref{String}, Ref{String},
+        Ref{Cint}, Ref{Cint}, Ptr{Cuchar}, Ref{Cint}, Ptr{Cint},
+        Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
+        printfile, sumfile, PRINTNUM, iSumm, w.cw, w.lencw, w.iw,
+        w.leniw, w.rw, w.lenrw)
+    return w
+end
+
+
+"""
+Close workspace
+"""
+function snendf(w)
+    ccall( (:snendf_, snoptlib), Nothing,
+        (Ptr{Cuchar}, Ref{Cint}, Ptr{Cint},
+        Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
+        w.cw, w.lencw, w.iw,
+        w.leniw, w.rw, w.lenrw)
     return w
 end
 
@@ -233,7 +322,7 @@ function openfiles(printfile, sumfile)
     printerr = Cint[0]
     sumerr = Cint[0]
     ccall( (:openfiles_, snoptlib), Nothing,
-        (Ref{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cuchar}, Ptr{Cuchar}),
+        (Ref{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{String}, Ptr{String}),
         PRINTNUM, SUMNUM, printerr, sumerr, printfile, sumfile)
 
     if printerr[1] != 0
@@ -600,8 +689,8 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols; kwargs...)
     end
 
     # --- open files ------
-    printfile = "snopt-print.out"
-    sumfile = "snopt-summary.out"
+    printfile = "snopt_print.out"
+    sumfile = "screen"
 
     if haskey(options, "Print file")
         printfile = options["Print file"]
@@ -612,7 +701,16 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols; kwargs...)
     #openfiles(printfile, sumfile)
 
     # ----- initialize -------
-    work = sninit(nx, nf, lencw, iSumm)
+    #work = sninit(nx, nf, lencw, iSumm)
+    work = sninit(printfile, sumfile, nx, nf, lencw, iSumm)
+    #work = sninitf(printfile, sumfile, nx, nf, lencw, iSumm)
+    # FIXME - DELETE FILE NAME manually
+    if haskey(options, "Print file")
+        delete!(options, "Print file")
+    end
+    if haskey(options, "Summary file")
+        delete!(options, "Summary file")
+    end
 
     # --- set options ----
     setoptions(options, work)   # FIXME!
@@ -668,6 +766,8 @@ function snopta(func!, start::Start, lx, ux, lg, ug, rows, cols; kwargs...)
     out = Outputs(start.f[2:end], work.iw[421], work.iw[422], work.rw[462],
         nInf[1], sInf[1], warm)
 
+    # close files
+    snendf(work)
     return start.x, start.f[1], codes[INFO[1]], out
 end
 

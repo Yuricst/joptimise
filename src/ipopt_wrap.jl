@@ -119,8 +119,22 @@ function process_ipopt_out(filename::String)
     end
     # process
     nlines = length(lines)
+    exit_message = lines[nlines][7:end]
+    # handle invalid nlp case
+    if cmp(exit_message, "Invalid number in NLP function or derivative detected.")==0
+        n_iter = 0
+        for line in lines
+            if startswith(line, "Number of Iterations....:")
+                n_iter = parse(Int64, line[26:end])
+            end
+        end
+        objective = NaN
+    else
+        n_iter = parse(Int64, lines[nlines-20][26:end])
+        objective = parse(Float64, lines[end-17][53:end])
+    end
     res = Dict(
-        "n_iter" => parse(Int64, lines[nlines-20][26:end]),
+        "n_iter" => n_iter,
         "n_obj_func_eval" =>  parse(Int64, lines[nlines-10][56:end]),
         "n_obj_grad_eval" =>  parse(Int64, lines[nlines-9][56:end]),
         "n_neqc_eval" =>      parse(Int64, lines[nlines-8][56:end]),
@@ -130,9 +144,9 @@ function process_ipopt_out(filename::String)
         "n_lagrange_hessian" => parse(Int64, lines[nlines-4][56:end]),
         "t_cpu_sec_ipopt" => parse(Float64, lines[nlines-3][56:end]),
         "t_cpu_sec_nlp"   => parse(Float64, lines[nlines-2][56:end]),
-        "EXIT"   => lines[nlines][7:end],
+        "EXIT"   => exit_message,
         "t_cpu" => parse(Float64, lines[nlines-2][56:end])+parse(Float64, lines[nlines-3][56:end]),
-        "objective" => parse(Float64, lines[end-17][53:end]),
+        "objective" => objective,
     )
     return lines, res
 end
