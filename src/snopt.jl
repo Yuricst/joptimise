@@ -13,7 +13,7 @@ and Snopt.jl (https://github.com/byuflowlab/Snopt.jl)
 #     # Set up library path
 # end
 
-const snoptlib = ENV["SNOPT7LIB"]#"libsnopt7"
+const snoptlib = ENV["SNOPT_SO"]#"libsnopt7"
 
 #const snoptlib = joinpath(dirname(@__FILE__), "../deps/src/libsnopt")
 
