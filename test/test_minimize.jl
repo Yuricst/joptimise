@@ -2,7 +2,9 @@
 Test minimize function
 """
 
-#push!(LOAD_PATH,"../src/")
+using ForwardDiff
+
+push!(LOAD_PATH,"../src/")
 using joptimise
 
 
@@ -35,10 +37,13 @@ ng = 1
 ## run minimizer with IPOPT
 ip_options = Dict(
     "max_iter" => 2500,   # 1500 ~ 2500
-    "tol" => 1e-6
+    "tol" => 1e-6,
+    "output_file" => "test_hogehoge_ipopt.out"
 )
 
-xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt", options=ip_options, derivatives=ForwardAD());
+xopt, fopt, info = joptimise.minimize(rosenbrock!, x0, ng;
+    lx=lx, ux=ux, lg=lg, ug=ug, solver="ipopt",
+    options=ip_options, outputfile=true);
 
 println("Done with IPOPT!")
 println(info)
@@ -52,9 +57,10 @@ sn_options = Dict(
     "Minor feasibility tolerance" => 1.e-6,
     "Major iterations limit" => 1000,
     "Major print level" => 1,
+    "printfile" => "snopt_print.out",
 )
 
-xopt, fopt, info = minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options, derivatives=ForwardAD());
+xopt, fopt, info = joptimise.minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options);
 
 println("Done with SNOPT!")
 println(info)

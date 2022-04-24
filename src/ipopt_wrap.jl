@@ -75,6 +75,7 @@ function minimize_ipopt(options::Dict, cache, x0, lx, ux, lg, ug, rows, cols, ou
     end
 
     # open output file
+    #println("outputfile: $outputfile")
     if outputfile==true
         # initialize options
         filename = "ipopt.out"
@@ -86,7 +87,8 @@ function minimize_ipopt(options::Dict, cache, x0, lx, ux, lg, ug, rows, cols, ou
             print_level = options["print_level"]
         end
         # create Ipopt output file
-        Ipopt.openOutputFile(prob, filename, print_level)
+        open_success = Ipopt.openOutputFile(prob, filename, print_level)
+        println("ipopt file name: $open_success")
     end
 
     # solve problem
@@ -97,6 +99,12 @@ function minimize_ipopt(options::Dict, cache, x0, lx, ux, lg, ug, rows, cols, ou
     xstar = prob.x
     fstar = prob.obj_val
     info  = Ipopt.ApplicationReturnStatus[status]
+
+    # close file (Ipopt doesn't seem to release the file)
+    #println("Closing file!")
+    # f = open(filename)
+    # close(f)
+    # println("isopen: ", isopen(f))
     return xstar, fstar, info
 end
 
@@ -149,4 +157,66 @@ function process_ipopt_out(filename::String)
         "objective" => objective,
     )
     return lines, res
+end
+
+
+"""
+    process_ipopt_out(filename::String)
+
+Process ipopt output file
+"""
+function process_ipopt_out(lines::Vector{String})
+    res = Dict()
+    for line in lines
+        if contains(line, "Number of Iterations....:")
+            res["n_iter"] = parse(Int64, line[26:end])
+        end
+
+        if contains(line, "Number of objective function evaluations")
+            res["n_obj_func_eval"] = parse(Int64, line[56:end])
+        end
+
+        if contains(line, "Number of objective gradient evaluations")
+            res["n_obj_grad_eval"] = parse(Int64, line[56:end])
+        end
+
+        if contains(line, "Number of equality constraint evaluations")
+            res["n_neqc_eval"] = parse(Int64, line[56:end])
+        end
+
+        if contains(line, "Number of inequality constraint evaluations")
+            res["n_nieqc_eval"] = parse(Int64, line[56:end])
+        end
+
+        if contains(line, "Number of equality constraint Jacobian evaluations")
+            res["n_neqc_jac_eval"] = parse(Int64, line[56:end])
+        end
+
+        if contains(line, "Number of inequality constraint Jacobian evaluations")
+            res["n_nieqc_jac_eval"] = parse(Int64, line[56:end])
+        end
+
+        if contains(line, "Number of Lagrangian Hessian evaluations")
+            res["n_lagrange_hessian"] = parse(Int64, line[56:end])
+        end
+
+        if contains(line, "Total CPU secs in IPOPT")
+            res["t_cpu_sec_ipopt"] = parse(Float64, line[56:end])
+        end
+
+        if contains(line, "Total CPU secs in NLP")
+            res["t_cpu_sec_nlp"] = parse(Float64, line[56:end])
+        end
+
+        if contains(line, "EXIT")
+            res["EXIT"] = line[7:end]
+        end
+
+        if contains(line, "Objective...............:")
+            res["objective"] = parse(Float64, line[53:end])
+        end
+    end
+    res["t_cpu"] = res["t_cpu_sec_ipopt"] + res["t_cpu_sec_nlp"]
+
+    return res
 end
