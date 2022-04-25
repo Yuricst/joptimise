@@ -30,3 +30,6 @@ fort*.*
 
 # OSX temp file
 *.DS_Store
+
+# SNOPT library
+src/snopt/libsnopt7/*
