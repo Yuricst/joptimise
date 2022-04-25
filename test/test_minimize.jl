@@ -60,6 +60,8 @@ sn_options = Dict(
     "printfile" => "snopt_print.out",
 )
 
+# initial guess
+x0 = [4.0; 4.0]
 xopt, fopt, info = joptimise.minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options);
 
 println("Done with SNOPT!")
