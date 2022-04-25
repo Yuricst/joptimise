@@ -3,6 +3,7 @@ Test minimize function
 """
 
 using ForwardDiff
+using Suppressor
 
 push!(LOAD_PATH,"../src/")
 using joptimise
@@ -61,8 +62,10 @@ sn_options = Dict(
 )
 
 # initial guess
+output = @capture_out begin
 x0 = [4.0; 4.0]
 xopt, fopt, info = joptimise.minimize(rosenbrock!, x0, ng; lx=lx, ux=ux, lg=lg, ug=ug, solver="snopt", options=sn_options);
+end
 
 println("Done with SNOPT!")
 println(info)
