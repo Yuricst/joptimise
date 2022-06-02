@@ -33,6 +33,17 @@ function finitediff_type(dtype)
 end
 
 
+## Sparcity
+abstract type AbstractSparsityPattern end
+
+struct DensePattern <: AbstractSparsityPattern end
+
+struct SparsePattern{TI} <: AbstractSparsityPattern
+    rows::Vector{TI}
+    cols::Vector{TI}
+end
+
+
 ## Gradients
 # internally used cache for gradients and jacobians (separately)
 struct GradOrJacCache{T1,T2,T3,T4}
@@ -148,17 +159,6 @@ end
 #
 
 
-## Sparcity
-abstract type AbstractSparsityPattern end
-
-struct DensePattern <: AbstractSparsityPattern end
-
-struct SparsePattern{TI} <: AbstractSparsityPattern
-    rows::Vector{TI}
-    cols::Vector{TI}
-end
-
-
 """
     SparsePattern(A::SparseMatrixCSC)
 construct sparse pattern from representative sparse matrix
@@ -224,111 +224,6 @@ end
 _get_sparsity(sp::SparsePattern, nx, nf) = sp.rows, sp.cols
 
 
-# ## Derivative types
-# abstract type AbstractDiffMethod end
-#
-# struct ForwardAD <: AbstractDiffMethod end
-# struct ReverseAD <: AbstractDiffMethod end
-# struct RevZyg <: AbstractDiffMethod end  # only used for gradients (not jacobians)
-# struct ForwardFD <: AbstractDiffMethod end
-# struct CentralFD <: AbstractDiffMethod end
-# struct ComplexStep <: AbstractDiffMethod end
-# struct UserDeriv <: AbstractDiffMethod end   # user-specified derivatives
-#
-#
-# FD = Union{ForwardFD, CentralFD, ComplexStep}
-#
-# """
-# convert to type used in FiniteDiff package
-# """
-# function finitediff_type(dtype)
-#     if isa(dtype, ForwardFD)
-#         fdtype = Val{:forward}
-#     elseif isa(dtype, CentralFD)
-#         fdtype = Val{:central}
-#     elseif isa(dtype, ComplexStep)
-#         fdtype = Val{:complex}
-#     end
-#     return fdtype
-# end
-
-
-# ## Sparsity patterns
-# abstract type AbstractSparsityPattern end
-#
-# struct DensePattern <: AbstractSparsityPattern end
-#
-# struct SparsePattern{TI} <: AbstractSparsityPattern
-#     rows::Vector{TI}
-#     cols::Vector{TI}
-# end
-#
-#
-# """
-#     SparsePattern(A::SparseMatrixCSC)
-# construct sparse pattern from representative sparse matrix
-# # Arguments
-# - `A::SparseMatrixCSC`: sparse jacobian
-# """
-# function SparsePattern(A::SparseMatrixCSC)
-#     rows, cols, _ = findnz(A)
-#     return SparsePattern(rows, cols)
-# end
-#
-#
-# """
-#     SparsePattern(A::Matrix)
-# construct sparse pattern from representative matrix
-# # Arguments
-# - `A::Matrix`: sparse jacobian
-# """
-# function SparsePattern(A::Matrix)
-#     return SparsePattern(sparse(A))
-# end
-#
-#
-# """
-#     SparsePattern(::FD, func!, ng, x1, x2, x3)
-# detect sparsity pattern by computing derivatives (using finite differencing)
-# at three different locations. Entries that are zero at all three
-# spots are assumed to always be zero.
-# # Arguments
-# - `func!::Function`: function of form f = func!(g, x)
-# - `ng::Int`: number of constraints
-# - `x1,x2,x3::Vector{Float}`:: three input vectors.
-# """
-# function SparsePattern(dtype::FD, func!, ng, x1, x2, x3)
-#
-#     fdtype = finitediff_type(dtype)
-#     cache = FiniteDiff.JacobianCache(x1, zeros(ng), fdtype)
-#
-#     nx = length(x1)
-#     J1 = zeros(ng, nx)
-#     J2 = zeros(ng, nx)
-#     J3 = zeros(ng, nx)
-#     FiniteDiff.finite_difference_jacobian!(J1, func!, x1, cache)
-#     FiniteDiff.finite_difference_jacobian!(J2, func!, x2, cache)
-#     FiniteDiff.finite_difference_jacobian!(J3, func!, x3, cache)
-#
-#     @. J1 = abs(J1) + abs(J2) + abs(J3)
-#     Jsp = sparse(J1)
-#
-#     return SparsePattern(Jsp)
-# end
-#
-#
-# #  used internally to get rows and cols for dense jacobian
-# function _get_sparsity(::DensePattern, nx, nf)
-#     len = nf*nx
-#     rows = [i for i = 1:nf, j = 1:nx][:]
-#     cols = [j for i = 1:nf, j = 1:nx][:]
-#     return rows, cols
-# end
-#
-# #  used internally to get rows and cols for sparse jacobian
-# _get_sparsity(sp::SparsePattern, nx, nf) = sp.rows, sp.cols
-
-
 ## Dense Jacobian cache
 # internally-used cache for dense jacobians
 struct DenseCache{T1,T2,T3,T4,T5}
@@ -342,6 +237,7 @@ end
 
 """
     _create_cache(sp::DensePattern, dtype::ForwardAD, func!, nx, ng)
+
 Cache for dense jacobian using forward-mode AD.
 # Arguments
 - `func!::function`: function of form: f = func!(g, x)
@@ -361,6 +257,24 @@ function _create_cache(sp::DensePattern, dtype::ForwardAD, func!, nx, ng)
 
     return DenseCache(combine!, g, J, config, dtype)
 end
+
+
+"""
+    _create_cache(sp::DensePattern, dtype::UserDeriv, func!, nx, ng)
+
+Cache for dense Jacobian with user-supplied derivatives
+
+# Arguments
+- `func!::function`: function of form: f = func!(g, df, dg, x)
+- `nx::Int`: number of design variables
+- `ng::Int`: number of constraints
+"""
+function _create_cache(sp::DensePattern, dtype::UserDeriv, func!, nx, ng)
+    Jwork = zeros(ng, nx)
+    return DenseCache(func!, 0.0, Jwork, nothing, dtype)
+end
+
+
 
 """
     evaluate!(g, df, dg, x, cache::DenseCache{T1,T2,T3,T4,T5} where {T1,T2,T3,T4,T5<:ForwardAD})
@@ -389,7 +303,9 @@ end
 
 """
     _create_cache(sp::DensePattern, dtype::FD, func!, nx, ng)
+
 Cache for dense jacobian using finite differencing
+
 # Arguments
 - `func!::function`: function of form: f = func!(g, x)
 - `nx::Int`: number of design variables
@@ -437,18 +353,6 @@ function evaluate!(g, df, dg, x, cache::DenseCache{T1,T2,T3,T4,T5}
 end
 
 
-"""
-    _create_cache(sp::DensePattern, dtype::UserDeriv, func!, nx, ng)
-Cache for dense Jacobian with user-supplied derivatives
-# Arguments
-- `func!::function`: function of form: f = func!(g, df, dg, x)
-- `nx::Int`: number of design variables
-- `ng::Int`: number of constraints
-"""
-function _create_cache(sp::DensePattern, dtype::UserDeriv, func!, nx, ng)
-    Jwork = zeros(ng, nx)
-    return DenseCache(func!, 0.0, Jwork, nothing, dtype)
-end
 
 """
     evaluate!(g, df, dg, x, cache::DenseCache{T1,T2,T3,T4,T5} where {T1,T2,T3,T4,T5<:UserDeriv})
@@ -471,7 +375,9 @@ end
 
 """
     _create_cache(sp::DensePattern, dtype::ReverseAD, func!, nx, ng)
+
 Cache for dense jacobian using reverse-mode AD.
+
 # Arguments
 - `func!::function`: function of form: f = func!(g, x)
 - `nx::Int`: number of design variables
@@ -660,8 +566,10 @@ end
 
 
 """
-    evaluate!(g, df, dg, x, cache::DenseCache{T1,T2,T3,T4,T5} where {T1,T2,T3,T4,T5<:UserDeriv})
+    evaluate!(g, df, dg, x, cache::GradOrJacCache{T1,T2,T3,T4}
+
 evaluate function and derivatives for a dense jacobian with user-provided derivatives
+
 # Arguments
 - `g::Vector{Float}`: constraints, modified in place
 - `df::Vector{Float}`: objective gradient, modified in place

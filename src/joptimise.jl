@@ -33,6 +33,7 @@ export ForwardFD
 export CentralFD
 export ForwardAD
 export ReverseAD
+export UserDeriv
 #export ComplexStep
 
 # sparsity
