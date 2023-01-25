@@ -40,8 +40,7 @@ lg = -Inf*one(ng)  # lower bounds on g
 ug = zeros(ng)  # upper bounds on g
 
 xopt, fopt, info = joptimise.minimize(
-    fitness!, x0, ng; 
+    fitness!, x0, ng;
     lx=lx, ux=ux, lg=lg, ug=ug,
     derivatives=joptimise.UserDeriv(),
 );
-
